@@ -14,11 +14,12 @@ const client = new Client({
 // LISTENS FOR BOT TO COME ONLINE
 client.on('ready', () => {
 	console.log('The bot is online!');
+
 });
 
 // CONFIGURE OPEN AI
 const configuration = new Configuration({
-	apiKey: process.env.API_KEY
+	apiKey: process.env.API_KEY,
 });
 
 const openai = new OpenAIApi(configuration);
@@ -36,32 +37,36 @@ client.on('messageCreate', async (message) => {
 	];
 
 	// MAKES BOT LOOK LIKE IT'S TYPING
-	await message.channel.sendTyping();
+	try {
+		await message.channel.sendTyping();
 
-  let previousMessage = await message.channel.messages.fetch({limit: 15});
-  previousMessage.reverse();
-  previousMessage.forEach((msg)=>{
-    if(message.content.startsWith('!')) return;
-    if(msg.author.id !== client.user.id && message.author.bot) return;
-    if(msg.author.id !== message.author.id) return;
+		let previousMessage = await message.channel.messages.fetch({ limit: 15 });
+		previousMessage.reverse();
 
-    conversationLog.push({
-      role: 'user',
-      content: msg.content
-    })
-  })
+		previousMessage.forEach((msg) => {
+			if (message.content.startsWith('!')) return;
+			if (msg.author.id !== client.user.id && message.author.bot) return;
+			if (msg.author.id !== message.author.id) return;
 
-	conversationLog.push({
-		role: 'user',
-		content: message.content,
-	});
+			conversationLog.push({
+				role: 'user',
+				content: msg.content,
+			});
+		});
 
-	const result = await openai.createChatCompletion({
-		model: 'gpt-3.5-turbo',
-		messages: conversationLog,
-	});
+		const result = await openai
+			.createChatCompletion({
+				model: 'gpt-3.5-turbo',
+				messages: conversationLog,
+			})
+			.catch((error) => {
+				console.log(`OPENAI ERR: ${error}`);
+			});
 
-	message.reply(result.data.choices[0].message);
+		message.reply(result.data.choices[0].message);
+	} catch (error) {
+		console.log(`ERROR: ${error}`);
+	}
 });
 
 // BOT LOGIN BLOCK
