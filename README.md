@@ -1,5 +1,7 @@
 # chat-gpt-discord-bot
 
+## Meet Dixon, my Discord server pocket Chat GPT Bot! 
 
-LEARNING HOW TO CREATE A DISCORD BOT.
-FOLLOWING TUTORIAL: https://www.youtube.com/watch?v=CB76_GDrPsE&t=46s
+
+
+This video does utilize the Youtube tutorial: []('')
